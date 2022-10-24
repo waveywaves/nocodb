@@ -3,7 +3,7 @@ name: Deploy Uffizzi Preview
 on:
   workflow_run:
     workflows:
-      - "PR Release"
+      - "Build PR Image for Uffizzi"
     types:
       - completed
 

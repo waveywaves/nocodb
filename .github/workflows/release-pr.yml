@@ -71,6 +71,17 @@ jobs:
       DOCKERHUB_USERNAME: "${{ secrets.DOCKERHUB_USERNAME }}"
       DOCKERHUB_TOKEN: "${{ secrets.DOCKERHUB_TOKEN }}"
 
+  # Create a preview for the pull request
+  preview-pull-request:
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]' && github.event.pull_request.draft == false && github.base_ref == 'develop' }}
+    needs: [set-tag, release-npm, release-docker]
+    uses: ./.github/workflows/uffizzi-preview.yml
+    with:
+      currentVersion: ${{ needs.set-tag.outputs.current_version }}
+      tag: ${{ needs.set-tag.outputs.target_tag }}
+      targetEnv: 'DEV'
+      isDaily: 'N'
+
   # Build executables and publish to GitHub
   release-executables:
     if: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]' && github.event.pull_request.draft == false && github.base_ref == 'develop' && github.event.action != 'closed' }}
